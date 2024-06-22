@@ -59,14 +59,13 @@ const Index = () => {
       localStorage.clear();
     });
   }, []);
-
   const handlePay = async () => {
     try {
       const orderData = products.map((product) => ({
         name: product.product_name,
         quantity: productCounts[product._id] || 1
       }));
-  
+
       // Prepare data for the second API
       const secondApiData = {
         ok: true,
@@ -75,19 +74,22 @@ const Index = () => {
           items: orderData
         }
       };
-  
+
       const secondResponse = await fetch('https://vermino.uz/bots/orders/CatDeliver/index.php', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
+
+        
         body: JSON.stringify(secondApiData)
       });
-  
+      console.log(secondApiData);
+
       if (secondResponse.ok) {
         localStorage.removeItem('selectedProducts');
         toast.success('Вы успешно разместили свой заказ!');
-  
+
         setTimeout(() => {
           navigate("/");
           telegram.close();
