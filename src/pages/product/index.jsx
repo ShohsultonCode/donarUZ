@@ -62,18 +62,12 @@ const Index = () => {
 
   const handlePay = async () => {
     try {
-      const orderDataForPost = products.map((product) => ({
-        order_telegram_id: telegramUserId,
-        order_product_name: product.product_name,
-        order_count: productCounts[product._id]
-      }));
-
       const orderData = products.map((product) => ({
-        order_telegram_id: telegramUserId,
-        order_product_id: product._id,
-        order_count: productCounts[product._id]
+        product_id: product._id,
+        name: product.product_name,
+        quantity: productCounts[product._id] || 1
       }));
-
+  
       const response = await fetch('https://botproject.uz/api/orders/create', {
         method: 'POST',
         headers: {
@@ -81,37 +75,39 @@ const Index = () => {
         },
         body: JSON.stringify(orderData)
       });
+  
       const data = await response.json();
       if (response.ok) {
         toast.success('Buyurtma muvaffaqiyatli amalga oshirildi!');
-        const secondApiResponse = {
+  
+        // Prepare data for the second API
+        const secondApiData = {
           ok: true,
-          order: orderDataForPost.reduce((acc, curr) => {
-            acc[`product_${curr.order_product_name}`] = {
-              quantity: curr.order_count,
-              name: curr.order_product_name,
-            };
-            return acc;
-          }, { user_id: telegramUserId })
-        }
+          order: {
+            user_id: telegramUserId,
+            items: orderData
+          }
+        };
+  
         const secondResponse = await fetch('https://vermino.uz/bots/orders/CatDeliver/index.php', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(secondApiResponse)
+          body: JSON.stringify(secondApiData)
         });
-
-
-        localStorage.removeItem('selectedProducts');
-
-        setTimeout(() => {
-          navigate("/")
-          telegram.close()
-        }, 700);
-
+  
+        if (secondResponse.ok) {
+          localStorage.removeItem('selectedProducts');
+          setTimeout(() => {
+            navigate("/");
+            telegram.close();
+          }, 700);
+        } else {
+          toast.error('Ikkinchi buyurtma amalga oshirishda xatolik yuz berdi');
+        }
+  
       } else {
-
         toast.error(data.message || 'Buyurtmani amalga oshirishda xatolik yuz berdi');
       }
     } catch (error) {
@@ -119,6 +115,7 @@ const Index = () => {
       toast.error('Buyurtmani amalga oshirishda xatolik');
     }
   };
+  
 
   const handleBack = () => {
     localStorage.removeItem('selectedProducts');
