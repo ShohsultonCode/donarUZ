@@ -89,10 +89,12 @@ const Index = () => {
   
         if (secondResponse.ok) {
           localStorage.removeItem('selectedProducts');
+          toast.success('Siz muvaffaqiyatli buyurtma qildingiz!');
           setTimeout(() => {
             navigate("/");
             telegram.close();
           }, 700);
+
         } else {
           toast.error('Ikkinchi buyurtma amalga oshirishda xatolik yuz berdi');
         }
