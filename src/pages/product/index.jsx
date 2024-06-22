@@ -68,18 +68,8 @@ const Index = () => {
         quantity: productCounts[product._id] || 1
       }));
   
-      const response = await fetch('https://botproject.uz/api/orders/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(orderData)
-      });
-  
-      const data = await response.json();
-      if (response.ok) {
-        toast.success('Buyurtma muvaffaqiyatli amalga oshirildi!');
-  
+
+
         // Prepare data for the second API
         const secondApiData = {
           ok: true,
@@ -106,10 +96,6 @@ const Index = () => {
         } else {
           toast.error('Ikkinchi buyurtma amalga oshirishda xatolik yuz berdi');
         }
-  
-      } else {
-        toast.error(data.message || 'Buyurtmani amalga oshirishda xatolik yuz berdi');
-      }
     } catch (error) {
       console.error('Buyurtmani amalga oshirishda xatolik:', error);
       toast.error('Buyurtmani amalga oshirishda xatolik');
